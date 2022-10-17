@@ -1,0 +1,5 @@
+/Clarion/obj/*
+/Clarion/map/*
+/Clarion/d32.log
+/Clarion/*.cache
+*.bak
