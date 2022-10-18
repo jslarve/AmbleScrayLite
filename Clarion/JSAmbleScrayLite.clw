@@ -114,8 +114,8 @@ Ndx          LONG
     RETURN ''
   END
 
-  WorkString &= NEW STRING(SIZE(pPlainText)) !Create a separate buffer to hold input, so we can 
-  WorkString = pPlainText
+  WorkString   &= NEW STRING(SIZE(pPlainText)) !Create a separate buffer to hold input, so we can 
+  WorkString    = pPlainText
   ReturnString &= NEW STRING(SIZE(pPlainText))
 
   IF pGenerate
@@ -190,8 +190,6 @@ c.Destruct PROCEDURE
   
   DISPOSE(WorkString)
   DISPOSE(ReturnString)
-
-
 
 !=========================================================================================================================================================
 VitCRC         PROCEDURE  (*STRING pStr)!,ULONG  

@@ -29,20 +29,20 @@ _JSAmbleScrayLitePresent_ EQUATE(1)
 
   INCLUDE('SystemString.inc'),ONCE
 
-JSAmbleScrayLiteQ  QUEUE,TYPE
-Pos                  ULONG
-Sort                 ULONG
-                   END   
+JSAmbleScrayLiteQ     QUEUE,TYPE
+Pos                     ULONG
+Sort                    ULONG
+                      END   
               
 JSAmbleScrayLiteClass CLASS,TYPE,MODULE('JSAmbleScrayLite.clw'),LINK('JSAmbleScrayLite.clw',_ABCLinkMode_),DLL(_ABCDllMode_)
-Q                    &JSAmbleScrayLiteQ
-Salt                  CSTRING(61)
-Construct             PROCEDURE
-Destruct              PROCEDURE,VIRTUAL
-GenerateMap           PROCEDURE(STRING pPassword,LONG pCount),LONG,PROC,VIRTUAL
-Scramble              PROCEDURE(STRING pPlainText,STRING pPassword,LONG pGenerate=TRUE),STRING
-SetSalt               PROCEDURE(STRING pSalt)
-UnScramble            PROCEDURE(STRING pScrambledText,STRING pPassword,LONG pGenerate=TRUE),STRING
-                   END
+Q                       &JSAmbleScrayLiteQ
+Salt                    CSTRING(61)
+Construct               PROCEDURE
+Destruct                PROCEDURE,VIRTUAL
+GenerateMap             PROCEDURE(STRING pPassword,LONG pCount),LONG,PROC,VIRTUAL
+Scramble                PROCEDURE(STRING pPlainText,STRING pPassword,LONG pGenerate=TRUE),STRING
+SetSalt                 PROCEDURE(STRING pSalt)
+UnScramble              PROCEDURE(STRING pScrambledText,STRING pPassword,LONG pGenerate=TRUE),STRING
+                      END
 
 !_EndOfInclude_
