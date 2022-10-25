@@ -1,4 +1,9 @@
   MEMBER
+
+!***Change Log
+! 2022.10.22 Initial Release
+! 2022.10.24 Some cleanup as suggested by Geoff Robinson
+
   
 !MIT License
 !
@@ -54,7 +59,7 @@ JSAmbleScrayLiteClass.Destruct     PROCEDURE
 JSAmbleScrayLiteClass.GenerateMap  PROCEDURE(STRING pKey,LONG pCount)  
 !=========================================================================================================================================================
 !This procedure is where half of the magic happens.
-!Based on the number of items (bits) that need scrambling, 
+!Based on the number of items (bytes) that need scrambling, 
 !this method generates the list and sorts it in a repeatable
 !yet random seeming way.
 
@@ -64,11 +69,11 @@ Ndx       LONG    !Iteration
 
   CODE
 
-  IF (LEN(pKey) < 1) OR (pCount < 1)
+  IF (SIZE(pKey) < 1) OR (pCount < 1)
     RETURN -1
   END
   
-  KeySize = (LEN(pCount) * 2) + 1 + LEN(pKey) + LEN(SELF.Salt) !Using double the number of digits for pCount because we're using it twice.
+  KeySize = (LEN(pCount) * 2) + 1 + SIZE(pKey) + LEN(SELF.Salt) !Using double the number of digits for pCount because we're using it twice.
   
   IF KeySize < 2
     RETURN -1
@@ -101,7 +106,6 @@ Ndx       LONG    !Iteration
 JSAmbleScrayLiteClass.Scramble    PROCEDURE(STRING pPlainText,STRING pPassword,LONG pGenerate=TRUE)
 !=========================================================================================================================================================
 !Scramble the plain text
-WorkString   &STRING
 ReturnString &STRING
 c            CLASS
 Destruct       PROCEDURE
@@ -114,8 +118,6 @@ Ndx          LONG
     RETURN ''
   END
 
-  WorkString   &= NEW STRING(SIZE(pPlainText)) !Create a separate buffer to hold input, so we can 
-  WorkString    = pPlainText
   ReturnString &= NEW STRING(SIZE(pPlainText))
 
   IF pGenerate
@@ -124,7 +126,7 @@ Ndx          LONG
 
   LOOP Ndx = 1 TO RECORDS(SELF.Q)
     GET(SELF.Q,Ndx)
-    ReturnString[SELF.Q.Pos] = WorkString[Ndx]
+    ReturnString[SELF.Q.Pos] = pPlainText[Ndx]
   END       
   
   RETURN ReturnString
@@ -133,7 +135,6 @@ c.Destruct PROCEDURE
 
   CODE
   
-  DISPOSE(WorkString)
   DISPOSE(ReturnString)
 
 !---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -147,8 +148,8 @@ JSAmbleScrayLiteClass.SetSalt PROCEDURE(STRING pSalt)
 
 !---------------------------------------------------------------------------------------------------------------------------------------------------------
 !!! <summary>Un-Scramble all of the bits in a buffer</summary>
-!!! <param name="pOutPlainTextST">A StringTheory object that will receive the un-Scrambled data</param>
-!!! <param name="pInScrambledST">A StringTheory object that contains the scrambled data to be unscrambled</param>
+!!! <param name="pOutPlainTextST">A String that will receive the un-Scrambled data</param>
+!!! <param name="pInScrambledST">A String that contains the scrambled data to be unscrambled</param>
 !!! <param name="pPassword">The password to be used to encode this data</param>
 !!! <param name="pIterations">The number of times to un-scramble the data</param>
 !!! <returns>Number of bits that were scrambled</returns>
@@ -156,7 +157,6 @@ JSAmbleScrayLiteClass.SetSalt PROCEDURE(STRING pSalt)
 JSAmbleScrayLiteClass.UnScramble    PROCEDURE(STRING pScrambledText,STRING pPassword,LONG pGenerate=TRUE)
 !=========================================================================================================================================================
 !Scramble the plain text
-WorkString &STRING
 ReturnString &STRING
 c          CLASS
 Destruct     PROCEDURE
@@ -169,8 +169,6 @@ Ndx        LONG
     RETURN ''
   END
 
-  WorkString &= NEW STRING(SIZE(pScrambledText)) !Create a separate buffer to hold input, so we can 
-  WorkString = pScrambledText
   ReturnString &= NEW STRING(SIZE(pScrambledText))
 
   IF pGenerate
@@ -179,7 +177,7 @@ Ndx        LONG
 
   LOOP Ndx = 1 TO RECORDS(SELF.Q)
     GET(SELF.Q,Ndx)
-    ReturnString[Ndx] = WorkString[SELF.Q.Pos]
+    ReturnString[Ndx] = pScrambledText[SELF.Q.Pos]
   END       
 
   RETURN ReturnString
@@ -188,7 +186,6 @@ c.Destruct PROCEDURE
 
   CODE
   
-  DISPOSE(WorkString)
   DISPOSE(ReturnString)
 
 !=========================================================================================================================================================

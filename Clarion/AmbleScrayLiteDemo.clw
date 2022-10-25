@@ -29,12 +29,11 @@
 OMIT('***')
  * Created with Clarion 10.0
  * User: Jeff Slarve
- * Date: 10/2/2022
- * Time: 9:05 AM
  * 
  * A demo of using the AmbleScrayLite class
  * https://github.com/jslarve/AmbleScrayLite
  ***
+
 PlainText             CSTRING(5001)         !Plain (original unscrambled) text
 Scrambled             CSTRING(5001)         !Scrambled rendition of the plain text
 Password              CSTRING(62)           !Password
@@ -70,7 +69,6 @@ Window WINDOW('AmbleScray Lite - Byte Scrambling Demo!'),AT(,,497,224),CENTER,GR
   END
 
   MAP
-    ClearCstring(*CSTRING pCS) !Force all bytes to <0>
   END
 
   CODE
@@ -109,8 +107,3 @@ Window WINDOW('AmbleScray Lite - Byte Scrambling Demo!'),AT(,,497,224),CENTER,GR
     END
   END
   
-ClearCString PROCEDURE(*CSTRING pCS)
-
-  CODE
-  
-  CLEAR(pCS[1 : SIZE(pCS)],-1) ! The string slicing syntax casts the CSTRING to a STRING. CLEAR(STRING,-1) clears a STRING to all 0.

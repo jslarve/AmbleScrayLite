@@ -1,5 +1,9 @@
 !ABCIncludeFile
 
+!***Change Log
+! 2022.10.22 Initial Release
+! 2022.10.24 Some cleanup as suggested by Geoff Robinson
+
 !MIT License
 !
 !Copyright (c) 2022 Jeff Slarve
