@@ -1,7 +1,7 @@
 # AmbleScrayLite
 ## Scramble data by way of a password.
 
-Version a.01.
+Version a.02.
 
 AmbleScray Lite is basically a simple way to re-arrange data in a reliably repeatable way. All it needs to know is two things: 
 - How many items need to be scrambled (in this case, how many characters)

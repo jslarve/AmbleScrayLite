@@ -1,8 +1,9 @@
 !ABCIncludeFile
 
 !***Change Log
-! 2022.10.22 Initial Release
+! 2022.11.13 Added hex class to support HEX/URI conversion without version discrepancies in the SystemString Class between versions
 ! 2022.10.24 Some cleanup as suggested by Geoff Robinson
+! 2022.10.22 Initial Release
 
 !MIT License
 !
@@ -31,7 +32,7 @@
 
 _JSAmbleScrayLitePresent_ EQUATE(1)
 
-  INCLUDE('SystemString.inc'),ONCE
+  INCLUDE('JS_HexTools.inc'),ONCE 
 
 JSAmbleScrayLiteQ     QUEUE,TYPE
 Pos                     ULONG

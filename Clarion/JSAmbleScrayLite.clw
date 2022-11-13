@@ -1,9 +1,9 @@
   MEMBER
 
 !***Change Log
-! 2022.10.22 Initial Release
+! 2022.11.13 Added hex class to support HEX/URI conversion without version discrepancies in the SystemString Class between versions
 ! 2022.10.24 Some cleanup as suggested by Geoff Robinson
-
+! 2022.10.22 Initial Release
   
 !MIT License
 !
@@ -106,10 +106,7 @@ Ndx       LONG    !Iteration
 JSAmbleScrayLiteClass.Scramble    PROCEDURE(STRING pPlainText,STRING pPassword,LONG pGenerate=TRUE)
 !=========================================================================================================================================================
 !Scramble the plain text
-ReturnString &STRING
-c            CLASS
-Destruct       PROCEDURE
-             END
+ReturnString JSDumbString
 Ndx          LONG
 
   CODE  
@@ -118,7 +115,7 @@ Ndx          LONG
     RETURN ''
   END
 
-  ReturnString &= NEW STRING(SIZE(pPlainText))
+  ReturnString.SetSize(SIZE(pPlainText))
 
   IF pGenerate
     SELF.GenerateMap(pPassword, SIZE(pPlainText))
@@ -126,16 +123,10 @@ Ndx          LONG
 
   LOOP Ndx = 1 TO RECORDS(SELF.Q)
     GET(SELF.Q,Ndx)
-    ReturnString[SELF.Q.Pos] = pPlainText[Ndx]
+    ReturnString.S[SELF.Q.Pos] = pPlainText[Ndx]
   END       
   
-  RETURN ReturnString
-
-c.Destruct PROCEDURE
-
-  CODE
-  
-  DISPOSE(ReturnString)
+  RETURN ReturnString.S
 
 !---------------------------------------------------------------------------------------------------------------------------------------------------------
 !=========================================================================================================================================================
@@ -157,11 +148,8 @@ JSAmbleScrayLiteClass.SetSalt PROCEDURE(STRING pSalt)
 JSAmbleScrayLiteClass.UnScramble    PROCEDURE(STRING pScrambledText,STRING pPassword,LONG pGenerate=TRUE)
 !=========================================================================================================================================================
 !Scramble the plain text
-ReturnString &STRING
-c          CLASS
-Destruct     PROCEDURE
-           END
-Ndx        LONG           
+ReturnString JSDumbString
+Ndx          LONG           
 
   CODE  
 
@@ -169,7 +157,7 @@ Ndx        LONG
     RETURN ''
   END
 
-  ReturnString &= NEW STRING(SIZE(pScrambledText))
+  ReturnString.SetSize(SIZE(pScrambledText))
 
   IF pGenerate
     SELF.GenerateMap(pPassword, SIZE(pScrambledText))
@@ -177,16 +165,10 @@ Ndx        LONG
 
   LOOP Ndx = 1 TO RECORDS(SELF.Q)
     GET(SELF.Q,Ndx)
-    ReturnString[Ndx] = pScrambledText[SELF.Q.Pos]
+    ReturnString.S[Ndx] = pScrambledText[SELF.Q.Pos]
   END       
 
-  RETURN ReturnString
-
-c.Destruct PROCEDURE
-
-  CODE
-  
-  DISPOSE(ReturnString)
+  RETURN ReturnString.S
 
 !=========================================================================================================================================================
 VitCRC         PROCEDURE  (*STRING pStr)!,ULONG  
