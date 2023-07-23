@@ -221,8 +221,10 @@ JSDumbString.SetSize PROCEDURE(LONG pSize)
 
   CODE
   
-  DISPOSE(SELF.S)
-  IF pSize < 1
-    pSize = 1
-  END
-  SELF.S &= NEW STRING(pSize)
+  IF (SELF.S &= NULL) OR (SIZE(SELF.S) <> pSize)
+    DISPOSE(SELF.S)
+    IF pSize < 1
+      pSize = 1
+    END
+    SELF.S &= NEW STRING(pSize)
+  END  

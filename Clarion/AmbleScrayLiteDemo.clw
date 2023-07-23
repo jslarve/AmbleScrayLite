@@ -38,6 +38,7 @@ OMIT('***')
 PlainText             CSTRING(5001)         !Plain (original unscrambled) text
 Scrambled             CSTRING(5001)         !Scrambled rendition of the plain text
 Password              CSTRING(62)           !Password
+Repetitions           LONG                  !Number of reps for each scramble/unscramble
 Ndx                   LONG                  !Generic counter
 EnDeCoding            BYTE                  !Used in radio to determine whether or not to encode/decode for a URI or full hex (such as space=%20)
 CopyResultToClipboard BYTE                  !Used in checkbox to determine whether or not to copy the resulting encode/decode to clipboard.
@@ -54,29 +55,30 @@ Window WINDOW('AmbleScray Lite - Byte Scrambling Demo!'),AT(,,497,234),CENTER,GR
     TEXT,AT(4,125,419,106),USE(Scrambled),VSCROLL,FONT('Consolas',12)
     PROMPT('Password:'),AT(427,2,33,8),USE(?PROMPT3)
     ENTRY(@s60),AT(427,13,67),USE(Password)
-    OPTION,AT(426,26,69),USE(EnDeCoding)
-      RADIO('En/De-code as Hex'),AT(426,27,73,8),USE(?EnDeCodeAsHex),FONT(,8), |
-          TIP('When checked, encodes a characters to hex'), |
-          VALUE('2')
-      RADIO('En/De-code as URI'),AT(426,35,73,8),USE(?EnDeCodeAsURI),FONT(,8), |
+    PROMPT('Reps:'),AT(429,28),USE(?PROMPT5)
+    SPIN(@n10),AT(451,28,42,10),USE(Repetitions),RIGHT(2),TIP('Number of iterations.'), |
+        RANGE(1,10000)
+    OPTION,AT(426,39,69),USE(EnDeCoding)
+      RADIO('En/De-code as Hex'),AT(426,40,73,8),USE(?EnDeCodeAsHex),FONT(,8), |
+          TIP('When checked, encodes a characters to hex'),VALUE('2')
+      RADIO('En/De-code as URI'),AT(426,48,73,8),USE(?EnDeCodeAsURI),FONT(,8), |
           TIP('When checked, encodes special characters so it''s suitable for us' & |
           'e on URI. NOTE: This also encodes spaces, which is not always desireable.'), |
           VALUE('1')
-      RADIO('As-Is'),AT(426,43,73,8),USE(?EnDeCodeAsIs),FONT(,8), |
-          TIP('When checked, encodes special characters so it''s suitable for us' & |
-          'e on URI. NOTE: This also encodes spaces, which is not always desireable.'), |
-          VALUE('0')
+      RADIO('As-Is'),AT(426,56,73,8),USE(?EnDeCodeAsIs),FONT(,8),TIP('When check' & |
+          'ed, encodes special characters so it''s suitable for use on URI. NOTE' & |
+          ': This also encodes spaces, which is not always desireable.'),VALUE('0')
     END
-    CHECK('Copy to Clipboard'),AT(426,51),USE(CopyResultToClipboard),FONT(,8), |
+    CHECK('Copy to Clipboard'),AT(426,65),USE(CopyResultToClipboard),FONT(,8), |
         TIP('Copies to clipboard the Scrambled or Plaintext result of a scramble' & |
         ' or unscramble operation.')
-    BUTTON('Scramble'),AT(427,60,68,14),USE(?ScrambleButton)
-    BUTTON('Un-Scramble'),AT(427,130,68,14),USE(?UnScrambleButton)
+    BUTTON('Scramble'),AT(427,73,68,14),USE(?ScrambleButton)
+    BUTTON('Un-Scramble'),AT(427,143,68,14),USE(?UnScrambleButton)
     BUTTON('Close'),AT(427,216,68),USE(?CloseButton),STD(STD:Close)
     PROMPT('Try changing the password, even in the least significant way, to see' & |
-        ' how wildy different the scrambled text looks.'),AT(426,74,70,55), |
+        ' how wildy different the scrambled text looks.'),AT(426,87,70,55), |
         USE(?PROMPT4)
-    LIST,AT(427,146,66,68),USE(?ScrambleOrderList),VSCROLL,FORMAT('20R(2)|M~Scra' & |
+    LIST,AT(427,160,66,53),USE(?ScrambleOrderList),VSCROLL,FORMAT('20R(2)|M~Scra' & |
         'mble Order~C(0)@n20@')
   END
 
@@ -85,8 +87,9 @@ Window WINDOW('AmbleScray Lite - Byte Scrambling Demo!'),AT(,,497,234),CENTER,GR
 
   CODE
   
-  Password   = 'My Password'
-  PlainText  = 'Now is the time for all good folks to come to the aid of their galaxy.'
+  Password    = 'My Password'
+  PlainText   = 'Now is the time for all good folks to come to the aid of their galaxy.'
+  Repetitions = 11
   
   OPEN(Window)
 
@@ -98,18 +101,18 @@ Window WINDOW('AmbleScray Lite - Byte Scrambling Demo!'),AT(,,497,234),CENTER,GR
     OF ?ScrambleButton
       CASE EnDeCoding
       OF 0
-        Scrambled = AmbleScray.Scramble(PlainText,Password)   
+        Scrambled = AmbleScray.ScrambleData(PlainText,Password,Repetitions)   
       OF 1
-        Scrambled = AmbleScray.Scramble(Hexer.URI_Encode(PlainText),Password)   
+        Scrambled = AmbleScray.ScrambleData(Hexer.URI_Encode(PlainText),Password,Repetitions)   
       OF 2
-        Scrambled = AmbleScray.Scramble(Hexer.StringToHex(PlainText),Password)   
+        Scrambled = AmbleScray.ScrambleData(Hexer.StringToHex(PlainText),Password,Repetitions)   
       END
       DISPLAY(?Scrambled)
       IF CopyResultToClipboard
         SETCLIPBOARD(Scrambled)
       END
     OF ?UnScrambleButton
-      PlainText = AmbleScray.UnScramble(Scrambled,Password)
+      PlainText = AmbleScray.UnScrambleData(Scrambled,Password,Repetitions)
       CASE EnDeCoding
       OF 1
         SS.DisposeIt()

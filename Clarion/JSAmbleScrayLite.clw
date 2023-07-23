@@ -1,6 +1,7 @@
   MEMBER
 
 !***Change Log
+! 2023.07.22 Added new ScrambleData/UnScrambleData methods to make compatible with other AmbleScray libraries. Existing methods left intact for backward compatibility.
 ! 2022.11.13 Added hex class to support HEX/URI conversion without version discrepancies in the SystemString Class between versions
 ! 2022.10.24 Some cleanup as suggested by Geoff Robinson
 ! 2022.10.22 Initial Release
@@ -31,6 +32,7 @@
   
   MAP
     VitCRC(*STRING pStr),ULONG !by Geoff Robinson - A CRC32 that's compatible with other languages. https://clarionhub.com/t/crc32-document/4485/9
+    ScrambleDataServer(JSAmbleScrayLiteClass pSelf,*STRING pData, STRING pPassword,BYTE pIsDecode),STRING,PRIVATE
   END
 
 !=========================================================================================================================================================
@@ -59,7 +61,7 @@ JSAmbleScrayLiteClass.Destruct     PROCEDURE
 JSAmbleScrayLiteClass.GenerateMap  PROCEDURE(STRING pKey,LONG pCount)  
 !=========================================================================================================================================================
 !This procedure is where half of the magic happens.
-!Based on the number of items (bytes) that need scrambling, 
+!Based on the number of items (bytes, or any collection of items) that need scrambling, 
 !this method generates the list and sorts it in a repeatable
 !yet random seeming way.
 
@@ -97,13 +99,13 @@ Ndx       LONG    !Iteration
   RETURN RECORDS(SELF.Q)
 
 !---------------------------------------------------------------------------------------------------------------------------------------------------------
-!!! <summary>Scramble all of the bits in a buffer to the point that the data is unrecognizable</summary>
+!!! <summary>LEGACY - Scramble all of the bits in a buffer to the point that the data is unrecognizable</summary>
 !!! <param name="pPlainTextST">A string containing the data to be scrambled</param>
 !!! <param name="pPassword">The password to be used to encode this data</param>
-!!! <param name="pIterations">The number of times to scramble the data</param>
+!!! <param name="pGenerate">Optionally regenerate scramble map</param>
 !!! <returns>String containing Scrambled data</returns>
 !=========================================================================================================================================================
-JSAmbleScrayLiteClass.Scramble    PROCEDURE(STRING pPlainText,STRING pPassword,LONG pGenerate=TRUE)
+JSAmbleScrayLiteClass.Scramble    PROCEDURE(STRING pPlainText,STRING pPassword,LONG pGenerate=TRUE) !LEGACY
 !=========================================================================================================================================================
 !Scramble the plain text
 ReturnString JSDumbString
@@ -128,6 +130,72 @@ Ndx          LONG
   
   RETURN ReturnString.S
 
+
+!---------------------------------------------------------------------------------------------------------------------------------------------------------
+!!! <summary>Scramble all of the bits in a buffer to the point that the data is unrecognizable</summary>
+!!! <param name="pPlainTextST">A string containing the data to be scrambled</param>
+!!! <param name="pPassword">The password to be used to encode this data</param>
+!!! <param name="pCount">The number of times to scramble the data</param>
+!!! <returns>String containing Scrambled data</returns>
+!=========================================================================================================================================================
+JSAmbleScrayLiteClass.ScrambleData            PROCEDURE(STRING pData,STRING pPassword,LONG pCount=1)!,STRING
+!=========================================================================================================================================================
+lPassword  JSDumbString
+lScrambled JSDumbString
+Ndx        LONG
+
+  CODE
+
+  IF NOT SIZE(pData)
+    RETURN ''
+  END
+  IF pCount < 1
+    pCount = 1
+  END
+  lScrambled.SetSize(SIZE(pData))
+  lScrambled.S = pData
+  LOOP Ndx = 0 TO pCount - 1
+    lPassword.SetSize((LEN(pPassword) * 3) + (LEN(Ndx) * 2))
+    lPassword.S = pPassword & Ndx & pPassword & Ndx & pPassword
+    lScrambled.S = SELF.ScrambleDataServer(lScrambled.S,lPassword.S,FALSE)
+  END  
+  RETURN lScrambled.S
+  
+!---------------------------------------------------------------------------------------------------------------------------------------------------------
+!=========================================================================================================================================================
+JSAmbleScrayLiteClass.ScrambleDataServer      PROCEDURE(*STRING pData, STRING pPassword,BYTE pIsDecode)!,STRING,PRIVATE
+!=========================================================================================================================================================
+!Scramble the plain text
+ReturnString JSDumbString
+Ndx          ULONG
+SrcNdx       &ULONG
+TarNdx       &ULONG
+
+  CODE  
+
+  IF NOT SIZE(pData)                !Nothing to scramble
+    RETURN ''
+  END
+
+  ReturnString.SetSize(SIZE(pData))
+  
+  IF pIsDecode
+    SrcNdx &= SELF.Q.Pos
+    TarNdx &= Ndx
+  ELSE
+    SrcNdx &= Ndx
+    TarNdx &= SELF.Q.Pos
+  END
+
+  SELF.GenerateMap(pPassword, SIZE(pData))
+
+  LOOP Ndx = 1 TO RECORDS(SELF.Q)
+    GET(SELF.Q,Ndx)
+    ReturnString.S[TarNdx] = pData[SrcNdx]
+  END       
+  
+  RETURN ReturnString.S
+
 !---------------------------------------------------------------------------------------------------------------------------------------------------------
 !=========================================================================================================================================================
 JSAmbleScrayLiteClass.SetSalt PROCEDURE(STRING pSalt)
@@ -145,7 +213,7 @@ JSAmbleScrayLiteClass.SetSalt PROCEDURE(STRING pSalt)
 !!! <param name="pIterations">The number of times to un-scramble the data</param>
 !!! <returns>Number of bits that were scrambled</returns>
 !=========================================================================================================================================================
-JSAmbleScrayLiteClass.UnScramble    PROCEDURE(STRING pScrambledText,STRING pPassword,LONG pGenerate=TRUE)
+JSAmbleScrayLiteClass.UnScramble    PROCEDURE(STRING pScrambledText,STRING pPassword,LONG pGenerate=TRUE) !LEGACY
 !=========================================================================================================================================================
 !Scramble the plain text
 ReturnString JSDumbString
@@ -169,6 +237,37 @@ Ndx          LONG
   END       
 
   RETURN ReturnString.S
+
+!---------------------------------------------------------------------------------------------------------------------------------------------------------
+!---------------------------------------------------------------------------------------------------------------------------------------------------------
+!!! <summary>Un-Scramble all of the bits in a buffer to the point that the data is unrecognizable</summary>
+!!! <param name="pPlainTextST">A string containing the data to be scrambled</param>
+!!! <param name="pPassword">The password to be used to encode this data</param>
+!!! <param name="pCount">The number of times to scramble the data</param>
+!!! <returns>String containing Scrambled data</returns>
+!=========================================================================================================================================================
+JSAmbleScrayLiteClass.UnScrambleData            PROCEDURE(STRING pData,STRING pPassword,LONG pCount=1)!,STRING
+!=========================================================================================================================================================
+lPassword    JSDumbString
+lUnScrambled JSDumbString
+Ndx        LONG
+
+  CODE
+
+  IF NOT SIZE(pData)
+    RETURN ''
+  END
+  IF pCount < 1
+    pCount = 1
+  END
+  lUnScrambled.SetSize(SIZE(pData))
+  lUnScrambled.S = pData
+  LOOP Ndx = pCount-1 TO 0 BY -1
+    lPassword.SetSize((LEN(pPassword) * 3) + (LEN(Ndx) * 2))
+    lPassword.S = pPassword & Ndx & pPassword & Ndx & pPassword
+    lUnScrambled.S = SELF.ScrambleDataServer(lUnScrambled.S,lPassword.S,TRUE)
+  END  
+  RETURN lUnScrambled.S
 
 !=========================================================================================================================================================
 VitCRC         PROCEDURE  (*STRING pStr)!,ULONG  

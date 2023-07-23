@@ -1,7 +1,13 @@
 # AmbleScrayLite
 ## Scramble data by way of a password.
 
-Version a.02.
+Version a.03.
+
+### UPDATE Jul 22, 2023 
+- Added ScrambleData() and UnScrambleData() methods to the CLARION version for compatibility with work I had done in other languages. 
+- These new methods have a parameter for number of iterations. These iterations are more than just calling the scramble routines repeatedly. The password is modified in every iteration.
+- Will be adding libraries for other languages (C#, Golang, JavaScript, Python, Ruby, Rust, TypeScript). These are actual re-usable libraries, vs the POC Javascript example in this repo.
+- In addition to these language additions, there will be more classes coming to complement AmbleScray Lite, and comprise a suite of tools.
 
 AmbleScray Lite is basically a simple way to re-arrange data in a reliably repeatable way. All it needs to know is two things: 
 - How many items need to be scrambled (in this case, how many characters)

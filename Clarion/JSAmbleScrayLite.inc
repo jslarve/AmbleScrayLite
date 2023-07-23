@@ -1,6 +1,7 @@
 !ABCIncludeFile
 
 !***Change Log
+! 2023.07.22 Added new ScrambleData/UnScrambleData methods to make compatible with other AmbleScray libraries. Existing methods left intact for backward compatibility.
 ! 2022.11.13 Added hex class to support HEX/URI conversion without version discrepancies in the SystemString Class between versions
 ! 2022.10.24 Some cleanup as suggested by Geoff Robinson
 ! 2022.10.22 Initial Release
@@ -45,9 +46,11 @@ Salt                    CSTRING(61)
 Construct               PROCEDURE
 Destruct                PROCEDURE,VIRTUAL
 GenerateMap             PROCEDURE(STRING pPassword,LONG pCount),LONG,PROC,VIRTUAL
-Scramble                PROCEDURE(STRING pPlainText,STRING pPassword,LONG pGenerate=TRUE),STRING
+Scramble                PROCEDURE(STRING pPlainText,STRING pPassword,LONG pGenerate=TRUE),STRING     !Original method for backwards compatibility
+ScrambleData            PROCEDURE(STRING pData,STRING pPassword,LONG pCount=1),STRING
 SetSalt                 PROCEDURE(STRING pSalt)
-UnScramble              PROCEDURE(STRING pScrambledText,STRING pPassword,LONG pGenerate=TRUE),STRING
+UnScramble              PROCEDURE(STRING pScrambledText,STRING pPassword,LONG pGenerate=TRUE),STRING !Original method for backwards compatibility
+UnScrambleData          PROCEDURE(STRING pData,STRING pPassword,LONG pCount=1),STRING
                       END
 
 !_EndOfInclude_
